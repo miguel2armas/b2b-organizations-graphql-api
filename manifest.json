@@ -1,0 +1,91 @@
+{
+  "name": "b2b-organizations-graphql",
+  "vendor": "vtex",
+  "version": "0.39.0",
+  "title": "B2B Organizations",
+  "description": "App to create and manage B2B Organizations and Cost Centers",
+  "mustUpdateAt": "2022-08-28",
+  "scripts": {
+    "postreleasy": "vtex publish"
+  },
+  "builders": {
+    "docs": "0.x",
+    "node": "6.x",
+    "graphql": "1.x"
+  },
+  "dependencies": {
+    "vtex.storefront-permissions": "1.x"
+  },
+  "policies": [
+    {
+      "name": "colossus-fire-event"
+    },
+    {
+      "name": "update-app-settings"
+    },
+    {
+      "name": "POWER_USER_DS"
+    },
+    {
+      "name": "ADMIN_DS"
+    },
+    {
+      "name": "OMSViewer"
+    },
+    {
+      "name": "ListOrders"
+    },
+    {
+      "name": "AcessaTodosPedidos"
+    },
+    {
+      "name": "CancelaPedidos"
+    },
+    {
+      "name": "ViewPayments"
+    },
+    {
+      "name": "Get_Account_By_Identifier"
+    },
+    {
+      "name": "read-workspace-apps"
+    },
+    {
+      "name": "vtex.storefront-permissions:resolve-graphql"
+    },
+    {
+      "name": "vtex.graphql-server:resolve-graphql"
+    },
+    {
+      "name": "template-criar"
+    },
+    {
+      "name": "send-message"
+    },
+    {
+      "name": "vbase-read-write"
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "portal.vtexcommercestable.com.br",
+        "path": "/api/*"
+      }
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "api.vtex.com",
+        "path": "/api/dataentities/*"
+      }
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "rc.vtex.com",
+        "path": "/api/analytics/schemaless-events"
+      }
+    }
+  ],
+  "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"
+}

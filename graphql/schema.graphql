@@ -1,0 +1,581 @@
+type Query {
+  getAppSettings: SettingsResponse @cacheControl(scope: PUBLIC, maxAge: SHORT)
+  getOrganizationRequests(
+    status: [String]
+    search: String
+    page: Int = 1
+    pageSize: Int = 25
+    sortOrder: String = "DESC"
+    sortedBy: String = "created"
+  ): OrganizationRequestResult @cacheControl(scope: PUBLIC, maxAge: SHORT)
+  getOrganizationRequestById(id: ID!): OrganizationRequest
+    @cacheControl(scope: PUBLIC, maxAge: SHORT)
+  getOrganizations(
+    status: [String]
+    search: String
+    page: Int = 1
+    pageSize: Int = 25
+    sortOrder: String = "ASC"
+    sortedBy: String = "name"
+  ): OrganizationResult @cacheControl(scope: PUBLIC, maxAge: SHORT)
+
+  getOrganizationsWithoutSalesManager: [Organization]
+    @cacheControl(scope: PRIVATE)
+
+  getOrganizationById(id: ID): Organization
+    @cacheControl(scope: PUBLIC, maxAge: SHORT)
+  getOrganizationByIdStorefront(id: ID): Organization
+    @withSession
+    @cacheControl(scope: PRIVATE)
+  getCostCenters(
+    search: String
+    page: Int = 1
+    pageSize: Int = 25
+    sortOrder: String = "ASC"
+    sortedBy: String = "name"
+  ): CostCenterResult @cacheControl(scope: PUBLIC, maxAge: SHORT)
+  getCostCentersByOrganizationId(
+    id: ID
+    search: String
+    page: Int = 1
+    pageSize: Int = 25
+    sortOrder: String = "ASC"
+    sortedBy: String = "name"
+  ): CostCenterResult @cacheControl(scope: PUBLIC, maxAge: SHORT)
+  getCostCentersByOrganizationIdStorefront(
+    id: ID
+    search: String
+    page: Int = 1
+    pageSize: Int = 25
+    sortOrder: String = "ASC"
+    sortedBy: String = "name"
+  ): CostCenterResult @withSession @cacheControl(scope: PRIVATE)
+  getCostCenterById(id: ID!): CostCenter
+    @cacheControl(scope: PUBLIC, maxAge: SHORT)
+  getCostCenterByIdStorefront(id: ID): CostCenter
+    @withSession
+    @cacheControl(scope: PRIVATE, maxAge: SHORT)
+  getUsers(organizationId: ID, costCenterId: ID): [B2BUser]
+    @withSession
+    @checkUserAccess
+    @cacheControl(scope: PRIVATE, maxAge: SHORT)
+  getUsersPaginated(
+    organizationId: ID
+    costCenterId: ID
+    page: Int
+    pageSize: Int
+    search: String
+    sortOrder: String
+    sortedBy: String
+  ): B2BUserPagination
+    @withSession
+    @checkUserAccess
+    @cacheControl(scope: PRIVATE, maxAge: SHORT)
+  getPaymentTerms: [PaymentTerm] @cacheControl(scope: PUBLIC, maxAge: SHORT)
+
+  getOrganizationsByEmail(email: String): [B2BOrganization]
+    @checkUserAccess
+    @cacheControl(scope: PRIVATE)
+
+  checkOrganizationIsActive(id: String): Boolean @cacheControl(scope: PRIVATE)
+  getSalesChannels: [Channels] @cacheControl(scope: PUBLIC, maxAge: SHORT)
+  getBinding(email: String!): Boolean
+    @withSession
+    @cacheControl(scope: PUBLIC, maxAge: SHORT)
+  getMarketingTags(costId: ID!): MarketingTags
+    @cacheControl(scope: PUBLIC, maxAge: SHORT)
+  getB2BSettings: B2BSettings @cacheControl(scope: PUBLIC, maxAge: SHORT)
+  getSellers: [Seller] @checkAdminAccess @cacheControl(scope: PRIVATE)
+}
+
+type Mutation {
+  saveAppSettings: MutationResponse @cacheControl(scope: PRIVATE)
+  createOrganizationRequest(
+    input: OrganizationInput!
+    notifyUsers: Boolean
+  ): MasterDataResponse
+  updateOrganizationRequest(
+    id: ID!
+    status: String!
+    notes: String
+    notifyUsers: Boolean
+  ): MutationResponse
+  deleteOrganizationRequest(id: ID!): MutationResponse
+  createOrganization(
+    input: OrganizationInput!
+    notifyUsers: Boolean
+  ): OrganizationCostCenterResponse
+    @checkAdminAccess
+    @cacheControl(scope: PRIVATE)
+  createCostCenter(
+    organizationId: ID
+    input: CostCenterInput!
+  ): MasterDataResponse
+    @withSession
+    @withPermissions
+    @checkUserAccess
+    @cacheControl(scope: PRIVATE)
+  updateOrganization(
+    id: ID!
+    name: String!
+    tradeName: String
+    status: String!
+    collections: [CollectionInput]
+    paymentTerms: [PaymentTermInput]
+    priceTables: [String]
+    customFields: [CustomFieldInput]
+    salesChannel: String
+    sellers: [SellerInput]
+    notifyUsers: Boolean
+  ): MutationResponse @checkAdminAccess @cacheControl(scope: PRIVATE)
+  updateCostCenter(id: ID!, input: CostCenterInput!): MutationResponse
+    @withSession
+    @withPermissions
+    @checkUserAccess
+    @cacheControl(scope: PRIVATE)
+  createCostCenterAddress(
+    costCenterId: ID
+    address: AddressInput
+  ): MutationResponse
+    @withSession
+    @withPermissions
+    @checkUserAccess
+    @cacheControl(scope: PRIVATE)
+  updateCostCenterAddress(
+    costCenterId: ID
+    address: AddressInput
+  ): MutationResponse
+    @withSession
+    @withPermissions
+    @checkUserAccess
+    @cacheControl(scope: PRIVATE)
+  deleteOrganization(id: ID!): MutationResponse
+    @checkAdminAccess
+    @cacheControl(scope: PRIVATE)
+  deleteCostCenter(id: ID!): MutationResponse
+    @withSession
+    @withPermissions
+    @checkUserAccess
+    @cacheControl(scope: PRIVATE)
+  saveUser(
+    id: ID
+    roleId: ID!
+    userId: ID
+    orgId: ID
+    costId: ID
+    clId: ID
+    canImpersonate: Boolean = false
+    name: String!
+    email: String!
+  ): MutationResponse
+    @withSession
+    @withPermissions
+    @checkUserAccess
+    @cacheControl(scope: PRIVATE)
+  addUser(
+    id: ID
+    roleId: ID!
+    userId: ID
+    orgId: ID
+    costId: ID
+    clId: ID
+    canImpersonate: Boolean = false
+    name: String!
+    email: String!
+  ): MutationResponse
+    @withSession
+    @withPermissions
+    @checkUserAccess
+    @cacheControl(scope: PRIVATE)
+  updateUser(
+    id: ID
+    roleId: ID!
+    userId: ID
+    orgId: ID
+    costId: ID
+    clId: ID
+    canImpersonate: Boolean = false
+    name: String
+    email: String
+  ): MutationResponse
+    @withSession
+    @withPermissions
+    @checkUserAccess
+    @cacheControl(scope: PRIVATE)
+  removeUser(id: ID!, userId: ID, email: String!, clId: ID!): MutationResponse
+    @withSession
+    @withPermissions
+    @checkUserAccess
+    @cacheControl(scope: PRIVATE)
+  impersonateUser(clId: ID, userId: ID): MutationResponse
+    @deprecated(reason: "Use impersonateB2BUser instead")
+    @withSession
+    @withPermissions
+    @cacheControl(scope: PRIVATE)
+  impersonateB2BUser(id: ID!): MutationResponse
+    @withSession
+    @withPermissions
+    @cacheControl(scope: PRIVATE)
+  saveSalesChannels(channels: [SalesChannelsInput]!): MutationResponse
+    @checkAdminAccess
+    @cacheControl(scope: PRIVATE)
+
+  setMarketingTags(costId: ID!, tags: [String]!): MutationResponse
+    @checkAdminAccess
+    @withSession
+    @withPermissions
+    @cacheControl(scope: PRIVATE)
+
+  saveB2BSettings(input: B2BSettingsInput): MutationResponse
+    @withSession
+    @withPermissions
+    @checkAdminAccess
+}
+
+type SettingsResponse {
+  adminSetup: Data
+}
+
+type OrganizationRequestResult {
+  data: [OrganizationRequest]
+  pagination: Pagination
+}
+
+type OrganizationResult {
+  data: [Organization]
+  pagination: Pagination
+}
+
+type CostCenterResult {
+  data: [CostCenter]
+  pagination: Pagination
+}
+
+type Pagination {
+  page: Int
+  pageSize: Int
+  total: Int
+}
+
+type OrganizationRequest {
+  id: ID
+  name: String
+  tradeName: String
+  defaultCostCenter: DefaultCostCenter
+  b2bCustomerAdmin: B2BUserSimple
+  status: String
+  notes: String
+  created: String
+  customFields: [CustomField]
+}
+
+type B2BUserSimple {
+  firstName: String
+  lastName: String
+  email: String
+}
+
+type Seller {
+  id: String
+  name: String
+  email: String
+}
+
+type DefaultCostCenter {
+  name: String
+  address: Address
+  phoneNumber: String
+  businessDocument: String
+  customFields: [CustomField]
+  stateRegistration: String
+  sellers: [Seller]
+}
+
+type Organization {
+  id: ID
+  name: String
+  tradeName: String
+  collections: [Collection]
+  paymentTerms: [PaymentTerm]
+  priceTables: [String]
+  sellers: [Seller]
+  customFields: [CustomField]
+  salesChannel: String
+  costCenters: [ID]
+  status: String
+  created: String
+}
+
+type Collection {
+  id: String
+  name: String
+}
+
+type PaymentTerm {
+  id: ID
+  name: String
+}
+
+type CostCenter {
+  id: ID
+  name: String
+  organization: ID
+  addresses: [Address]
+  paymentTerms: [PaymentTerm]
+  phoneNumber: String
+  businessDocument: String
+  customFields: [CustomField]
+  stateRegistration: String
+  sellers: [Seller]
+}
+
+type Address {
+  addressId: String
+  addressType: String
+  addressQuery: String
+  postalCode: String
+  country: String
+  receiverName: String
+  city: String
+  state: String
+  street: String
+  number: String
+  complement: String
+  neighborhood: String
+  geoCoordinates: [Float]
+  reference: String
+}
+
+type MasterDataResponse {
+  id: String
+  href: String
+  status: String
+}
+
+type OrganizationCostCenterResponse {
+  id: String
+  costCenterId: String
+  href: String
+  status: String
+}
+
+type MutationResponse {
+  id: String
+  status: String
+  message: String
+}
+
+type B2BUserPagination {
+  data: [B2BUser]
+  pagination: Pagination
+}
+
+type B2BUser {
+  id: ID
+  roleId: ID
+  userId: ID
+  clId: ID
+  orgId: ID
+  costId: ID
+  name: String!
+  email: String!
+  canImpersonate: Boolean
+  role: SimpleRole
+  organizationName: String
+  costCenterName: String
+}
+
+type B2BOrganization {
+  id: ID
+  clId: ID
+  costId: ID
+  orgId: ID
+  roleId: ID
+  role: SimpleRole
+  organizationName: String
+  organizationStatus: String
+  costCenterName: String
+}
+
+type SimpleRole {
+  id: ID
+  name: String!
+  slug: String
+}
+
+type Channels {
+  id: String
+  name: String
+}
+
+type MarketingTags {
+  tags: [String]
+}
+
+type B2BSettings {
+  autoApprove: Boolean
+  businessReadOnly: Boolean
+  stateReadOnly: Boolean
+  defaultPaymentTerms: [PaymentTerm]
+  defaultPriceTables: [String]
+  organizationCustomFields: [SettingsCustomField]
+  costCenterCustomFields: [SettingsCustomField]
+  uiSettings: UISettings
+  transactionEmailSettings: TransactionEmailSettings
+}
+
+type TransactionEmailSettings {
+  organizationApproved: Boolean
+  organizationCreated: Boolean
+  organizationDeclined: Boolean
+  organizationRequestCreated: Boolean
+  organizationStatusChanged: Boolean
+}
+
+type UISettings {
+  showModal: Boolean
+  clearCart: Boolean
+}
+
+scalar Data
+
+input OrganizationInput {
+  name: String
+  tradeName: String
+  b2bCustomerAdmin: B2BUserInput
+  defaultCostCenter: DefaultCostCenterInput
+  costCenters: [DefaultCostCenterInput]
+  paymentTerms: [PaymentTermInput]
+  priceTables: [String]
+  salesChannel: String
+  sellers: [SellerInput]
+  customFields: [CustomFieldInput]
+}
+
+input B2BUserInput {
+  firstName: String
+  lastName: String
+  email: String
+}
+
+input DefaultCostCenterInput {
+  name: String
+  address: AddressInput
+  phoneNumber: String
+  businessDocument: String
+  customFields: [CustomFieldInput]
+  stateRegistration: String
+  marketingTags: [String]
+  user: B2BUserInput
+  sellers: [SellerInput]
+}
+
+input CostCenterInput {
+  name: String
+  addresses: [AddressInput]
+  paymentTerms: [PaymentTermInput]
+  phoneNumber: String
+  businessDocument: String
+  customFields: [CustomFieldInput]
+  stateRegistration: String
+}
+
+input AddressInput {
+  addressId: String
+  addressType: String
+  addressQuery: String
+  postalCode: String
+  country: String
+  receiverName: String
+  city: String
+  state: String
+  street: String
+  number: String
+  complement: String
+  neighborhood: String
+  geoCoordinates: [Float]
+  reference: String
+}
+
+input CollectionInput {
+  id: String
+  name: String
+}
+
+input SellerInput {
+  id: String
+  name: String
+}
+
+input PaymentTermInput {
+  id: ID
+  name: String
+}
+
+enum CustomFieldType {
+  text
+  dropdown
+}
+
+type CustomField {
+  name: String
+  type: CustomFieldType
+  value: String
+  dropdownValues: [DropdownValue]
+  useOnRegistration: Boolean
+}
+
+type SettingsCustomField {
+  name: String
+  type: CustomFieldType
+  dropdownValues: [DropdownValue]
+  useOnRegistration: Boolean
+}
+
+input CustomFieldInput {
+  name: String!
+  type: CustomFieldType!
+  value: String
+  dropdownValues: [DropdownValueInput]
+  useOnRegistration: Boolean
+}
+
+input SalesChannelsInput {
+  id: String
+  name: String
+}
+
+input TransactionEmailSettingsInput {
+  organizationApproved: Boolean
+  organizationCreated: Boolean
+  organizationDeclined: Boolean
+  organizationRequestCreated: Boolean
+  organizationStatusChanged: Boolean
+}
+
+input UISettingsInput {
+  showModal: Boolean
+  clearCart: Boolean
+}
+
+input B2BSettingsInput {
+  autoApprove: Boolean
+  businessReadOnly: Boolean
+  stateReadOnly: Boolean
+  defaultPaymentTerms: [PaymentTermInput]
+  defaultPriceTables: [String]
+  uiSettings: UISettingsInput
+  organizationCustomFields: [CustomFieldInput]
+  costCenterCustomFields: [CustomFieldInput]
+  transactionEmailSettings: TransactionEmailSettingsInput
+}
+
+type DropdownValue {
+  value: String
+  label: String
+}
+
+input DropdownValueInput {
+  value: String
+  label: String
+}

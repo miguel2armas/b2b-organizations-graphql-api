@@ -1,0 +1,36 @@
+{
+  "stack": "nodejs",
+  "memory": 1024,
+  "ttl": 300,
+  "timeout": 60,
+  "cpu": {
+    "type": "shared",
+    "value": 5,
+    "scalingPercentage": 20
+  },
+  "minReplicas": 8,
+  "maxReplicas": 80,
+  "workers": 1,
+  "routes": {
+    "addNewUser": {
+      "path": "/_v/addNewUser",
+      "public": true
+    },
+    "orders": {
+      "path": "/_v/private/b2b/oms/user/orders/",
+      "public": true
+    },
+    "checkout": {
+      "path": "/b2b/oms/user/checkout/",
+      "public": true
+    },
+    "order": {
+      "path": "/_v/private/b2b/oms/user/orders/:orderId",
+      "public": true
+    },
+    "requestCancellation": {
+      "path": "/_v/private/b2b/checkout/pub/orders/:orderId/user-cancel-request",
+      "public": true
+    }
+  }
+}

@@ -1,0 +1,7 @@
+node_modules/
+.editorconfig
+.eslintrc
+.gitignore
+README.md
+**/*.test.*
+**/*.mock.*
